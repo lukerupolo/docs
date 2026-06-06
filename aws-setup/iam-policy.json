@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ClaudeCodeWebGeneralReadStarter",
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity",
+        "s3:Get*",
+        "s3:List*",
+        "ec2:Describe*",
+        "lambda:List*",
+        "lambda:Get*",
+        "cloudwatch:Describe*",
+        "cloudwatch:Get*",
+        "cloudwatch:List*",
+        "logs:Describe*",
+        "logs:Get*",
+        "logs:FilterLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
