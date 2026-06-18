@@ -1,90 +1,93 @@
-<div align="center">
-  <div>
-    <a href="https://strandsagents.com">
-      <img src="https://strandsagents.com/latest/assets/logo-github.svg" alt="Strands Agents" width="55px" height="105px">
-    </a>
-  </div>
+# Lingo — a LingQ-style language learning app
 
-  <h1>
-    Strands Agents Documentation
-  </h1>
+Read texts in a foreign language, click words to save them with a status and
+translation, and review them with spaced repetition. Built with Next.js
+(App Router) + TypeScript.
 
-  <h2>
-    A model-driven approach to building AI agents in just a few lines of code.
-  </h2>
+## Features (current MVP)
 
-  <div align="center">
-    <a href="https://github.com/strands-agents/docs/graphs/commit-activity"><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/strands-agents/docs"/></a>
-    <a href="https://github.com/strands-agents/docs/issues"><img alt="GitHub open issues" src="https://img.shields.io/github/issues/strands-agents/docs"/></a>
-    <a href="https://github.com/strands-agents/docs/pulls"><img alt="GitHub open pull requests" src="https://img.shields.io/github/issues-pr/strands-agents/docs"/></a>
-    <a href="https://github.com/strands-agents/docs/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/strands-agents/docs"/></a>
-  </div>
-  
-  <p>
-    <a href="https://strandsagents.com/">Documentation</a>
-    ◆ <a href="https://github.com/strands-agents/samples">Samples</a>
-    ◆ <a href="https://github.com/strands-agents/sdk-python">Python SDK</a>
-    ◆ <a href="https://github.com/strands-agents/tools">Tools</a>
-    ◆ <a href="https://github.com/strands-agents/agent-builder">Agent Builder</a>
-    ◆ <a href="https://github.com/strands-agents/mcp-server">MCP Server</a>
-  </p>
-</div>
+- **Library** — your lessons with reading progress and vocabulary stats.
+- **Reader** — paste any text; words are highlighted by status (blue = new,
+  fading yellow = learning, none = known). Click a word to set its status and
+  save a translation/notes.
+- **Vocabulary** — every saved word, filterable by status, searchable.
+- **Review** — spaced-repetition (SM-2 lite) flashcards for words that are due.
+- **Import** — create lessons from pasted text, or bulk-import a word list
+  (`term, translation` per line). This is how a vocabulary export gets ingested.
 
-This repository contains the documentation for the Strands Agents SDK, a simple yet powerful framework for building and running AI agents. The documentation is built using [MkDocs](https://www.mkdocs.org/) and provides guides, examples, and API references.
+## Storage
 
-The official documentation is available online at: https://strandsagents.com.
+Data is stored as JSON documents through a small `DocStore` abstraction
+(`src/lib/store.ts`) with two backends, selected by environment variables:
 
-## Local Development
+- **S3** — used when `S3_BUCKET` is set. Documents live under `S3_PREFIX`.
+- **Local files** — fallback under `DATA_DIR` (default `.data/`), so the app
+  runs with zero config in development.
 
-### Prerequisites
+Layout:
 
-- Python 3.10+, node 20+
+```
+lessons/index.json      Lesson[]              (metadata + text)
+words/<language>.json   Record<term, Word>    (status, translation, SRS state)
+```
 
-### Setup and Installation
+Switching from local to S3 is just setting env vars — no code changes.
+
+## Running locally
 
 ```bash
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-
-pip install .
-
-# Install node dependencies
 npm install
+npm run dev        # http://localhost:3000
 ```
 
-### Building and Previewing
-
-To generate the static site:
+Production:
 
 ```bash
-mkdocs build
+npm run build && npm run start
 ```
 
-This will create the site in the `site` directory.
+### Enabling S3
 
-To run a local development server:
+Copy `.env.example` to `.env` and set:
 
-```bash
-mkdocs serve
+```
+S3_BUCKET=your-bucket
+S3_PREFIX=lingo
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
 ```
 
-This will start a server at http://127.0.0.1:8000/ for previewing the documentation.
+## API
 
-## Contributing ❤️
+| Method | Route                   | Purpose                                  |
+| ------ | ----------------------- | ---------------------------------------- |
+| GET    | `/api/lessons`          | list lessons                             |
+| POST   | `/api/lessons`          | create a lesson `{title,text,language}`  |
+| GET    | `/api/lessons/:id`      | get one lesson                           |
+| PATCH  | `/api/lessons/:id`      | update reading progress                  |
+| DELETE | `/api/lessons/:id`      | delete a lesson                          |
+| GET    | `/api/words`            | list saved words                         |
+| POST   | `/api/words`            | upsert a word                            |
+| POST   | `/api/words/statuses`   | map of `{term: status}` for a term list  |
+| POST   | `/api/words/import`     | bulk import a word list                  |
+| GET    | `/api/review`           | words due for review                     |
+| POST   | `/api/review`           | grade a card `{term,grade}`              |
+| GET    | `/api/stats`            | known / learning / due counts            |
 
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details on:
-- Reporting bugs & features
-- Development setup
-- Contributing via Pull Requests
-- Code of Conduct
-- Reporting of security issues
+## Importing a word list
 
-## License
+`POST /api/words/import` with:
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+```json
+{
+  "language": "es",
+  "overwrite": false,
+  "entries": [
+    { "term": "perro", "translation": "dog", "status": 2 },
+    { "term": "casa", "translation": "house", "status": 5 }
+  ]
+}
+```
 
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
+Status codes: `0` new, `1–4` learning, `5` known, `-1` ignored.

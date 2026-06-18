@@ -1,24 +1,23 @@
-*.DS_Store
-.cache/
-/app.tar
-/app/
-site/
-*.bak
-__pycache__
-.venv
-.idea
-.kiro
-*.egg-info
+# dependencies
+/node_modules
 
-node_modules
-uv.lock
+# next.js
+/.next/
+/out/
 
-temp_python_sdk
-sdk-typescript
-package-lock.json
+# production
+/build
 
-# Generated documentation
-docs/api-reference/
-__*__/
+# local data store (S3 fallback)
+/.data
 
+# env
+.env
+.env*.local
 
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+next-env.d.ts
+*.tsbuildinfo
