@@ -11,7 +11,11 @@ translation, and review them with spaced repetition. Built with Next.js
   fading yellow = learning, none = known). Click a word to set its status and
   save a translation/notes.
 - **Vocabulary** — every saved word, filterable by status, searchable.
-- **Review** — spaced-repetition (SM-2 lite) flashcards for words that are due.
+- **Review** — spaced-repetition (SM-2 lite) flashcards with two modes:
+  _recognition_ (see the word, recall its meaning) and _active recall_ (see the
+  meaning, produce the word/phrase yourself). Optionally drill known words too.
+- **Practice** — write a sentence in your target language and get AI grammar
+  corrections with explanations (Claude API; optional, see below).
 - **Import** — create lessons from pasted text, or bulk-import a word list
   (`term, translation` per line). This is how a vocabulary export gets ingested.
 
@@ -74,6 +78,8 @@ AWS_SECRET_ACCESS_KEY=...
 | GET    | `/api/review`           | words due for review                     |
 | POST   | `/api/review`           | grade a card `{term,grade}`              |
 | GET    | `/api/stats`            | known / learning / due counts            |
+| GET    | `/api/feedback`         | whether AI feedback is configured        |
+| POST   | `/api/feedback`         | AI grammar check `{text,language}`       |
 
 ## Importing a word list
 

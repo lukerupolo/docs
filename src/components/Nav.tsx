@@ -7,6 +7,7 @@ const links = [
   { href: "/", label: "Library" },
   { href: "/vocab", label: "Vocabulary" },
   { href: "/review", label: "Review" },
+  { href: "/practice", label: "Practice" },
   { href: "/import", label: "Import" },
 ];
 

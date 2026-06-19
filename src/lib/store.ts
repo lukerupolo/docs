@@ -7,6 +7,7 @@
 
 import { promises as fs } from "fs";
 import path from "path";
+import os from "os";
 
 export interface DocStore {
   read<T>(key: string): Promise<T | null>;
@@ -112,7 +113,13 @@ export function getStore(): DocStore {
       process.env.AWS_REGION ?? "us-east-1"
     );
   } else {
-    cached = new LocalStore(process.env.DATA_DIR ?? ".data");
+    // Local-file fallback. On serverless hosts (e.g. Vercel) the project dir is
+    // read-only, so default to a writable temp dir there. NOTE: temp storage is
+    // ephemeral — for durable data on a serverless host, configure S3.
+    const dir =
+      process.env.DATA_DIR ??
+      (process.env.VERCEL ? path.join(os.tmpdir(), "lingo") : ".data");
+    cached = new LocalStore(dir);
   }
   return cached;
 }
