@@ -28,7 +28,12 @@ export default async function ReadPage({
           {lesson.language.toUpperCase()} · {lesson.wordCount} words
         </span>
       </div>
-      <h1 style={{ marginTop: 0 }}>{lesson.title}</h1>
+      <div className="row between" style={{ flexWrap: "wrap", gap: 8 }}>
+        <h1 style={{ marginTop: 0, marginBottom: 8 }}>{lesson.title}</h1>
+        <Link href={`/debate?lesson=${lesson.id}`} className="btn primary">
+          🎙️ Debate this
+        </Link>
+      </div>
       <Reader
         lessonId={lesson.id}
         language={lesson.language}

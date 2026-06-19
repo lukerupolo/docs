@@ -10,14 +10,24 @@ translation, and review them with spaced repetition. Built with Next.js
 - **Reader** — paste any text; words are highlighted by status (blue = new,
   fading yellow = learning, none = known). Click a word to set its status and
   save a translation/notes.
-- **Vocabulary** — every saved word, filterable by status, searchable.
-- **Review** — spaced-repetition (SM-2 lite) flashcards with two modes:
-  _recognition_ (see the word, recall its meaning) and _active recall_ (see the
-  meaning, produce the word/phrase yourself). Optionally drill known words too.
+- **Vocabulary** — every saved word, filterable by status, searchable. This is
+  your vocabulary _profile_, which powers the agentic features below.
+- **Discover** _(agentic)_ — Claude searches the live web (server-side web
+  search + fetch) for authentic content in your target language that reuses the
+  words you're learning and stays at a comprehensible level, then drops it into
+  your reader.
+- **Debate** _(agentic)_ — an AI partner that's "read" your article. A two-gear
+  flow: first you retell it, then you debate — it takes a stance, pushes back,
+  baits you toward complex sentences, steers you to your target words, and
+  recasts your mistakes inline.
 - **Practice** — write a sentence in your target language and get AI grammar
-  corrections with explanations (Claude API; optional, see below).
+  corrections with explanations.
 - **Import** — create lessons from pasted text, or bulk-import a word list
-  (`term, translation` per line). This is how a vocabulary export gets ingested.
+  (`term, translation` per line).
+
+The agentic features (Discover, Debate, Practice) use the Claude API
+(`claude-opus-4-8`) and require `ANTHROPIC_API_KEY`; without it the rest of the
+app still works and those pages explain how to enable them.
 
 ## Storage
 
@@ -75,11 +85,11 @@ AWS_SECRET_ACCESS_KEY=...
 | POST   | `/api/words`            | upsert a word                            |
 | POST   | `/api/words/statuses`   | map of `{term: status}` for a term list  |
 | POST   | `/api/words/import`     | bulk import a word list                  |
-| GET    | `/api/review`           | words due for review                     |
-| POST   | `/api/review`           | grade a card `{term,grade}`              |
-| GET    | `/api/stats`            | known / learning / due counts            |
+| GET    | `/api/stats`            | known / learning counts                  |
 | GET    | `/api/feedback`         | whether AI feedback is configured        |
 | POST   | `/api/feedback`         | AI grammar check `{text,language}`       |
+| POST   | `/api/discover`         | agentic web search for content `{language,topic?}` |
+| POST   | `/api/debate`           | AI debate turn `{language,title,article,vocab,phase,history}` |
 
 ## Importing a word list
 

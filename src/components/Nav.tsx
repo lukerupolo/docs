@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/", label: "Library" },
-  { href: "/vocab", label: "Vocabulary" },
-  { href: "/review", label: "Review" },
+  { href: "/discover", label: "Discover" },
+  { href: "/debate", label: "Debate" },
   { href: "/practice", label: "Practice" },
+  { href: "/vocab", label: "Vocabulary" },
   { href: "/import", label: "Import" },
 ];
 
